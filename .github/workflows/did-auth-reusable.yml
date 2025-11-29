@@ -1,0 +1,61 @@
+name: Reusable DID Auth Exchange
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        required: false
+        type: string
+        default: '.'
+      did_config_path:
+        required: false
+        type: string
+        default: 'config/identity.web5.json'
+      resolver_dry_run:
+        required: false
+        type: string
+        default: 'true'
+    outputs:
+      has-session:
+        description: 'Indicates whether a DID session token was written to $GITHUB_ENV for this job (true/false).'
+        type: string
+
+jobs:
+  did-auth:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      has-session: ${{ steps.did-auth.outputs.has-session }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: did-auth: run
+        id: did-auth
+        run: |
+          set -euo pipefail
+          WORKDIR=${{ inputs.working-directory }}
+          cd "$WORKDIR"
+          export DID_WEB5_IDENTITY_CONFIG=${{ inputs.did_config_path }}
+          if [ "${{ inputs.resolver_dry_run }}" = "true" ]; then
+            export RESOLVER_DRY_RUN=true
+          fi
+          # Run the did-auth exchange script; it writes `DID_WEB5_SESSION_TOKEN` to $GITHUB_ENV on success.
+          node scripts/did-auth-exchange.js || exit 1
+          # Check whether the job's GITHUB_ENV contains the DID_WEB5_SESSION_TOKEN marker; set output accordingly.
+          if [ -n "${GITHUB_ENV:-}" ] && grep -q '^DID_WEB5_SESSION_TOKEN=' "${GITHUB_ENV}" >/dev/null 2>&1; then
+            echo "has-session=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-session=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The reusable workflow is intentionally minimal: it performs a job-scoped did-auth step and exposes a boolean flag.
+      # Do NOT use this workflow to pass tokens via outputs or artifacts.
+      # The caller of this reusable workflow should either perform did-auth in their own job (preferred) or call this workflow and run downstream steps in the same job scope.

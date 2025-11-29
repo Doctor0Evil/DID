@@ -31,3 +31,8 @@ All tests are run via `make test` (or `npm test`) and `make ci-check` performs a
 4. If compromise is suspected, rotate Web5 agent keys externally, revoke tokens from resolver, and disable CI did-auth runs until triage completes.
 
 For detailed procedures, diagnostics, and rotation guidance, see `DOCS/DID_AUTH.md`.
+
+## Reusable did-auth workflow
+- This repository provides `.github/workflows/did-auth-reusable.yml` as a reusable workflow that callers can `workflow_call` to perform a job-scoped did-auth exchange.
+- The reusable workflow sets a boolean output `has-session` indicating whether a session token was created in `$GITHUB_ENV` for the job; it does NOT expose the token value.
+- Callers should perform downstream steps that need the token in the same job, or run their own did-auth step in their job; Do NOT pass tokens as artifacts or job outputs.

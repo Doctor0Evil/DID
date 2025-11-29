@@ -50,6 +50,11 @@ High level steps for rotation:
 
 Important: No rotation steps should require changing sensitive values in this repository; all secrets remain external to the repo and should be handled by the Web5 resolver or a secret manager.
 
+## Reusable did-auth workflow
+- A reusable workflow is available at `.github/workflows/did-auth-reusable.yml` that callers may `workflow_call` from repos with the same DID/Web5 trust boundary.
+- The reusable workflow runs a job-scoped did-auth step and sets a boolean output `has-session` to indicate whether a job-scoped token exists. It does NOT expose tokens or allow token values via outputs.
+- Callers should perform downstream steps in the same job or perform their own did-auth exchange; do not serialize tokens across jobs or artifacts.
+
 ## Security Notes
 
 - `resolver_endpoint` must point to an HTTPS endpoint operated by a trusted Web5 agent; do not use HTTP endpoints in production.

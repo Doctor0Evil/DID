@@ -4,10 +4,15 @@
   "description": "DID/Web5 workspace for CI authentication demo",
   "main": "index.js",
   "scripts": {
+    "prepare": "husky install",
     "test": "node tests/run-tests.js",
-    "lint": "eslint . || true"
+    "lint": "eslint . || true",
+    "secret-scan": "make secret-scan"
   },
   "keywords": ["web5", "did", "ci", "oidc"],
   "author": "Doctor Jacob Scott Farmer",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "husky": "^8.0.0"
+  }
 }

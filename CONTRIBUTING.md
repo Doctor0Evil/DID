@@ -21,3 +21,7 @@ Thank you for contributing! Please follow these guidelines:
 - Any change that logs OIDC tokens, DID session tokens, or resolver responses is a security regression and must be reverted.
 - Use `make ci-check` before opening PRs that touch CI/DID/Web5 auth.
 
+### Husky pre-commit (optional)
+- If Husky is installed locally (and the `prepare` script is present), a pre-commit hook will run `make secret-scan` to prevent accidental secret commits.
+- Do not bypass this hook; if you must, run `make secret-scan` manually before pushing.
+

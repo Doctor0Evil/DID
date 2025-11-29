@@ -1,0 +1,9 @@
+#!/bin/sh
+# Pre-commit hook: Prevent accidental secret commits by running a fast secret-scan.
+# Keep this script minimal and fast: exclude vendor and binary dirs if needed.
+
+# Run secret-scan; abort commit on detection
+make secret-scan || {
+  echo "Secret-scan detected potential secrets. Commit aborted. Run make secret-scan and investigate before committing.";
+  exit 1;
+}

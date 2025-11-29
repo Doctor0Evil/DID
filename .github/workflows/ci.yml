@@ -82,5 +82,27 @@ jobs:
         run: |
           node -e "require('./scripts/resolve-did.js');"
 
+# Example: Call the reusable did-auth workflow as a `workflow_call` from another job.
+# Uncomment and configure the inputs to use in your project. This example demonstrates
+# two safe patterns: run the did-auth step inside the job for a job-scoped token OR use the
+# reusable workflow and run downstream steps in the same job. Do NOT pass tokens via outputs/artifacts.
+#
+# did-auth-reuse-example:
+#   runs-on: ubuntu-latest
+#   permissions:
+#     id-token: write
+#     contents: read
+#   steps:
+#     - name: Reuse did-auth reusable workflow
+#       uses: Doctor0Evil/DID/.github/workflows/did-auth-reusable.yml@main
+#       with:
+#         working-directory: '.'
+#         did_config_path: 'config/identity.web5.json'
+#         resolver_dry_run: 'true'
+#     - name: Use job-scoped DID token
+#       run: |
+#         # The token is job-scoped and available via $GITHUB_ENV; do not attempt to print the token.
+#         echo "Downstream steps can use the job-scoped DID_WEB5_SESSION_TOKEN from an env var"
+
 # Note: This workflow does not include secrets or token references. Integration with a Web5/DID agent
 # should be performed by reusable workflows or external actions that resolve credentials at runtime.
