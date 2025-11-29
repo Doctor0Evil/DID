@@ -43,4 +43,5 @@
 - Created `config/identity.web5.json` with DID anchor metadata and owner.
 - Created `DOCS/PROJECT_OVERVIEW.md` with detected stack, entry points, and DID notes.
 - Added `Makefile` placeholder and initial CI & README improvements (if not present).
+- Hardened DID/Web5 CI Authentication: This repository now includes a hardened, DID/Web5-based, tokenless CI authentication flow. See `DOCS/DID_WEB5_CI_SUMMARY.md` and `DOCS/DID_AUTH.md` for details.
 

@@ -15,3 +15,9 @@ Thank you for contributing! Please follow these guidelines:
 ## CI
 - New changes should not cause CI checks to fail. The CI workflow runs quick lint, tests, and formatting checks.
 
+## DID/Web5 CI Auth Rules
+- Do not introduce GitHub secrets or long-lived tokens for CI auth; use the existing did-auth pattern.
+- If you modify scripts `did-auth-*`, update tests in `tests/test-did-exchange-*.js` and `tests/test-no-artifact-token-leak.js` and ensure they pass.
+- Any change that logs OIDC tokens, DID session tokens, or resolver responses is a security regression and must be reverted.
+- Use `make ci-check` before opening PRs that touch CI/DID/Web5 auth.
+
