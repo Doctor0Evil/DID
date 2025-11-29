@@ -1,3 +1,13 @@
+# Reusable DID Auth Exchange
+#
+# Intended usage: This workflow is a reusable, secretless component that performs a job-scoped
+# DID Web5 authentication exchange using GitHub Actions OIDC and a Web5/DID resolver.
+#
+# To reference this workflow from another repository in your org use a pinned tag:
+#   uses: org/repo/.github/workflows/did-auth-reusable.yml@v1
+#
+# Callers must supply their own `identity.web5.json` config file in the caller repository
+# and must not store private keys or long-lived tokens in the repository.
 name: Reusable DID Auth Exchange
 
 on:

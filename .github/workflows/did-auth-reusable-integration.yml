@@ -1,0 +1,33 @@
+name: Reusable DID Auth Integration Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  did-auth-integration:
+    name: did-auth-integration
+    uses: ./.github/workflows/did-auth-reusable.yml
+    with:
+      working-directory: '.'
+      did_config_path: 'config/identity.web5.json'
+      resolver_dry_run: 'true'
+
+  check-session:
+    runs-on: ubuntu-latest
+    needs: [did-auth-integration]
+    steps:
+      - name: Show result
+        run: |
+          # We cannot access the token itself from the reusable workflow as it is job-scoped.
+          # Instead, check the boolean output `has-session` returned by the reusable workflow.
+          if [ "${{ needs.did-auth-integration.outputs.has-session }}" = "true" ]; then
+            echo "Reusable did-auth workflow produced a job-scoped session token.";
+            exit 0;
+          fi
+          echo "Reusable did-auth workflow did not produce a session token (dry-run may be configured).";
+          exit 1;
+        env:
+          GITHUB_ENV: ${{ env.GITHUB_ENV }}
+
+# This integration workflow is a safe dry-run example and should not be used to call real resolvers
+# unless explicitly configured; keep `resolver_dry_run: 'true'` for safe test runs.

@@ -36,3 +36,9 @@ For detailed procedures, diagnostics, and rotation guidance, see `DOCS/DID_AUTH.
 - This repository provides `.github/workflows/did-auth-reusable.yml` as a reusable workflow that callers can `workflow_call` to perform a job-scoped did-auth exchange.
 - The reusable workflow sets a boolean output `has-session` indicating whether a session token was created in `$GITHUB_ENV` for the job; it does NOT expose the token value.
 - Callers should perform downstream steps that need the token in the same job, or run their own did-auth step in their job; Do NOT pass tokens as artifacts or job outputs.
+
+## Versioning & tags
+
+To publish stable versions of this reusable workflow for use across an organization, tag a commit with semantic tags (for example: `v1` or `v1.0.0`).
+Consumers should reference pinned tags in `uses:` statements (for example, `uses: org/repo/.github/workflows/did-auth-reusable.yml@v1`) to avoid accidental breaking changes when the reusable workflow is updated on `main`.
+When making a non-backward-compatible change, bump major tag (e.g., `v2`) and document the change in `CHANGELOG.md` as necessary.

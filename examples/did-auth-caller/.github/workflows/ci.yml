@@ -1,0 +1,26 @@
+name: Example Caller CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout example caller
+        uses: actions/checkout@v4
+
+      - name: Call reusable did-auth (relative reference)
+        uses: ../../.github/workflows/did-auth-reusable.yml
+        with:
+          working-directory: '.'
+          did_config_path: 'config/identity.web5.json'
+          resolver_dry_run: 'true'
+
+      - name: Check session
+        run: |
+          # We cannot print token; check has-session output via needs in a real multi-job setup or rely on GITHUB_ENV
+          echo "Example caller repo: did-auth succeeded (token not shown)."

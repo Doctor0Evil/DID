@@ -27,3 +27,12 @@ make ci-check
 This will run `make init`, force a `did-auth` dry-run (no network call if `resolver_endpoint` is a placeholder or `RESOLVER_DRY_RUN` is `true`), run the secret scan, and run the test suite.
 
 For a concise overview of this pattern, see `DOCS/DID_WEB5_CI_SUMMARY.md`.
+
+### Local Husky setup (optional but recommended)
+If `husky` is installed as a devDependency and `.husky/pre-commit` exists, run the following once after cloning to enable hooks:
+
+```bash
+npx husky install
+```
+
+The pre-commit hook will run `make secret-scan` to help prevent accidental token or secret commits; to bypass (emergency only) run `HUSKY=0 git commit` but then run `make secret-scan` manually prior to pushing.
