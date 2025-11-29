@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// TODO:RAPTOR-SEC-REVIEW: Validate OIDC values and HTTP headers carefully in a real implementation. This
+// script is a CI-side example; real deployments should use a hardened Web5/DID agent and enforce strict
+// validation policies. This script deliberately avoids network calls unless resolver_endpoint is non-placeholder.
 // DID Auth Exchange Script
 // Exports functions for use in tests and runs as CLI in CI.
 
