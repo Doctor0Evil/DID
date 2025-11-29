@@ -1,0 +1,30 @@
+{
+  "name": "DID Codespace",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:0-20",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:1": {}
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": "bash -lc 'git config --global user.name \"Codespace User\" && git config --global user.email \"despace@example.com\"; if [ -f package.json ]; then echo \"package.json found, running npm ci\" && npm ci || true; else echo \"No package.json found - skipping npm install\"; fi; if [ -f requirements.txt ]; then pip install -r requirements.txt || true; fi; mkdir -p .vscode; echo \"DID_WEB5_IDENTITY=did:ion:EiD8J2b3K8k9Q8x9L7m2n4p1q5r6s7t8u9v0w1x2y3z4A5B6C7D8E9F0\" > .env.example || true'",
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind,consistency=cached"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-vscode.gitlens",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode-remote.remote-containers"
+      ],
+      "settings": {
+        "terminal.integrated.shell.windows": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+      }
+    }
+  },
+  "containerEnv": {
+    "DID_WEB5_IDENTITY": "did:ion:EiD8J2b3K8k9Q8x9L7m2n4p1q5r6s7t8u9v0w1x2y3z4A5B6C7D8E9F0"
+  }
+}

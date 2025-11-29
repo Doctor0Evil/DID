@@ -1,0 +1,6 @@
+{
+  "did_identity_anchor": "did:ion:EiD8J2b3K8k9Q8x9L7m2n4p1q5r6s7t8u9v0w1x2y3z4A5B6C7D8E9F0",
+  "owner_name": "Doctor Jacob Scott Farmer",
+  "runtime_resolver": "external-web5-agent",
+  "usage": ["code-signing", "pipeline-identity", "audit-trails"]
+}
