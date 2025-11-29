@@ -4,9 +4,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const { exchangeWithResolver, readIdentityConfig } = require('./did-auth-exchange');
+const { exchangeWithResolver } = require('./did-auth-exchange');
+const { loadDidConfig } = require('./did-auth-config');
 
 function writeSessionToTmp(token) {
+  // Local-only file, gitignored: DO NOT change to a tracked file. This is only for local dev flows.
   const p = path.join(__dirname, '..', '.did-session.tmp');
   try {
     fs.writeFileSync(p, token, { encoding: 'utf8', flag: 'w' });
@@ -17,7 +19,7 @@ function writeSessionToTmp(token) {
 }
 
 async function main() {
-  const cfg = readIdentityConfig();
+  const cfg = loadDidConfig();
   if (!cfg) {
     console.error('Missing identity config');
     process.exit(1);

@@ -22,6 +22,21 @@ This document explains the tokenless CI pattern used in this repository.
 - Downstream steps in the same job can access `DID_WEB5_SESSION_TOKEN` from the environment without exposing it to job outputs or logs.
 - Downstream steps should use the `DID_WEB5_SESSION_TOKEN` environment variable and include the DID anchor as `X-DID-Identity` header for any resolver calls or API requests.
 
+## Operator Runbook
+
+After changing `resolver_endpoint`, perform these runtime checks:
+
+1. Confirm `did-auth` step in CI succeeds (no token printed in the logs).
+2. Confirm downstream steps can read `DID_WEB5_SESSION_TOKEN` from the environment and the token is not logged anywhere.
+3. Confirm the resolver's runtime logs show the OIDC token was validated and mapped to the DID, and that the resolver generated a short-lived capability token.
+
+Incident response: If a compromise is suspected, rotate the Web5 agent keys, revoke issued capabilities at the resolver, and temporarily disable CI runs containing `did-auth` until the environment is recovered.
+
+## Security Notes
+
+- `resolver_endpoint` must point to an HTTPS endpoint operated by a trusted Web5 agent; do not use HTTP endpoints in production.
+- `identity.web5.json` contains only public metadata (the DID anchor and resolver URL); no secrets or signing keys should ever be stored in this file or the repository.
+
 ## Security notes
 - This repo stores only the DID anchor (`did_identity_anchor`) and paths to the config. No private keys, long-lived secrets, or tokens are stored.
 - The real credential resolution and signing should be implemented in an external Web5/DID agent; CI scripts only demonstrate the exchange pattern and do not perform signing.

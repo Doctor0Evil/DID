@@ -9,17 +9,12 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const http = require('http');
+const { loadDidConfig } = require('./did-auth-config');
 
-function readIdentityConfig() {
-  const p = path.join(__dirname, '..', 'config', 'identity.web5.json');
-  try {
-    const raw = fs.readFileSync(p, 'utf8');
-    const cfg = JSON.parse(raw);
-    return cfg;
-  } catch (err) {
-    return null;
-  }
-}
+// Contractual: load DID config via the config facade to centralize validation
+function readIdentityConfig() { return loadDidConfig(); }
+
+// Do NOT log or persist the OIDC token; it must only live in memory for this exchange.
 
 function fetchOidcTokenFromGitHub(oidcUrl, oidcToken, audience) {
   return new Promise((resolve, reject) => {
@@ -39,6 +34,8 @@ function fetchOidcTokenFromGitHub(oidcUrl, oidcToken, audience) {
         Authorization: `Bearer ${oidcToken}`
       }
     };
+    // Contractual: Do not log or persist the raw OIDC token. It should only live in-memory for the duration
+    // of the exchangeWithResolver and must not be written to logs, files, or outputs.
     const req = lib.request(opts, (res) => {
       let data = '';
       res.on('data', (chunk) => (data += chunk));
@@ -134,7 +131,8 @@ async function exchangeWithResolver(opts = {}) {
   // If resolver endpoint contains 'example' or is a placeholder, don't make a network call; just return dry run token.
   const resolverEndpoint = opts.resolverEndpoint || cfg.resolver_endpoint || cfg.resolverEndpoint;
   if (!resolverEndpoint) throw new Error('Missing resolver endpoint');
-  if (resolverEndpoint.includes('example') || resolverEndpoint.includes('placeholder') || resolverEndpoint.includes('local')) {
+  const forceDry = (process.env.RESOLVER_DRY_RUN === 'true') || opts.forceDry;
+  if (forceDry || resolverEndpoint.includes('example') || resolverEndpoint.includes('placeholder') || resolverEndpoint.includes('local')) {
     // Dry run mode: return a masked token without network call. In CI we will still write an ephemeral marker.
     const dryToken = 'DID_DRYRUN_TOKEN_PLACEHOLDER';
     if (opts.setEnv !== false) writeToGithubEnv('DID_WEB5_SESSION_TOKEN', dryToken);
@@ -149,9 +147,11 @@ async function exchangeWithResolver(opts = {}) {
     capability_audience: cfg.capability_audience || 'github-actions'
   };
 
+  // Contractual: Resolver must return short-lived tokens; long-lived or reusable keys are forbidden and should be rejected by the resolver.
   const resp = await postToResolver(resolverEndpoint, payload);
   // Expecting { token: '...' }
   if (!resp || !resp.token) throw new Error('Resolver returned no token');
+  // Contractual: this is the only place the DID session token is stored in the runner; do not add any other sinks.
   if (opts.setEnv !== false) writeToGithubEnv('DID_WEB5_SESSION_TOKEN', resp.token);
   return resp;
 }
@@ -177,4 +177,4 @@ if (require.main === module) {
   })();
 }
 
-module.exports = { exchangeWithResolver, fetchOidcTokenFromGitHub, postToResolver, readIdentityConfig, writeToGithubEnv };
+module.exports = { exchangeWithResolver, fetchOidcTokenFromGitHub, postToResolver, writeToGithubEnv };

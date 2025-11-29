@@ -12,6 +12,7 @@
 - `scripts/check-revocation.js` - check revocation status
  - `scripts/did-auth-exchange.js` - DID auth exchange script used by CI to exchange GitHub OIDC token for a short-lived DID capability
  - `scripts/did-auth-local.js` - local helper for developer flows that requests a dry-run token and stores it locally
+*Note:* The CI job includes an early `did-auth` step that runs `scripts/did-auth-exchange.js` and writes `DID_WEB5_SESSION_TOKEN` to the job environment (`$GITHUB_ENV`) so that downstream steps can use it without job output exposure.
 - `README.md` - descriptive guide for the repository
 
 ## Build / Run Commands

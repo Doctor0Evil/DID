@@ -30,3 +30,12 @@ secret-scan:
 	PATTERN='(A3T[A-Z0-9]{14}|AKIA[0-9A-Z]{16}|BEGIN RSA PRIVATE KEY|-----BEGIN PRIVATE KEY|BEGIN EC PRIVATE KEY|PRIVATE KEY|ghp_[A-Za-z0-9_]{36}|GITHUB_TOKEN)'; \\
 	FOUND=$$($${EGREP} "$${PATTERN}" . || true); \\
 	if [ ! -z "$$FOUND" ]; then echo "Potential secrets detected:"; echo "$$FOUND"; exit 1; else echo "No high-confidence secrets detected"; fi
+
+ci-check:
+	@echo "Running CI health check (dry-run)"
+	@echo "Initializing..."
+	@make init
+	@echo "Running did-auth dry-run..."
+	@RESOLVER_DRY_RUN=true node scripts/did-auth-exchange.js || true
+	@make secret-scan
+	@make test

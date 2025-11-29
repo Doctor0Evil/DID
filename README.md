@@ -16,3 +16,12 @@ This repository demonstrates a tokenless CI authentication pattern where:
 - The CI workflow runs a `did-auth` step early in the build job that writes the session token as `DID_WEB5_SESSION_TOKEN` to the job environment via `$GITHUB_ENV`. Downstream steps in the same job can use it; it is not echoed to logs.
 
 See `DOCS/DID_AUTH.md` for more details and operator tasks.
+
+### Quick Health Check
+Run the following to perform a lightweight CI health check (dry-run):
+
+```bash
+make ci-check
+```
+
+This will run `make init`, force a `did-auth` dry-run (no network call if `resolver_endpoint` is a placeholder or `RESOLVER_DRY_RUN` is `true`), run the secret scan, and run the test suite.

@@ -44,6 +44,9 @@ jobs:
 
       - name: Echo DID identity anchor
         run: echo "Using DID identity anchor from config/identity.web5.json"
+      # OIDC ID token is obtained using GitHub's built-in OIDC support (ACTIONS_ID_TOKEN_REQUEST_URL/TOKEN).
+      # Short-lived DID session is written to $GITHUB_ENV and is job-scoped; do not export tokens via job outputs or echo them.
+      # To reuse DID session in another job, run the did-auth step in that job or use secure secret managers; do not serialize tokens into artifacts or job outputs.
       - name: did-auth: exchange
         id: did-auth
         run: |
