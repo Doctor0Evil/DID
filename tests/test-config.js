@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { loadDidConfig } = require('../scripts/did-auth-config');
 function assert(condition, msg) {
   if (!condition) throw new Error(msg || 'Assertion failed');
 }
@@ -16,5 +17,13 @@ function run() {
   assert(Array.isArray(cfg.usage) && cfg.usage.length > 0, 'Missing usage array');
   console.log('test-config OK');
 }
+// Additional test for config facade
+function runFacade() {
+  const cfg = loadDidConfig();
+  if (!cfg || !cfg.did_identity_anchor) throw new Error('loadDidConfig did not return a valid config');
+  console.log('test-config facade OK');
+}
+
+module.exports = { run, runFacade };
 if (require.main === module) run();
 module.exports = { run };

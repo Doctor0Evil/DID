@@ -171,7 +171,8 @@ if (require.main === module) {
       console.log('DID auth exchange success');
       process.exit(0);
     } catch (err) {
-      console.error('DID auth exchange failed: ' + (err.message || err));
+      const msg = (err && err.message) ? err.message : 'unknown error';
+      console.error('DID auth exchange failed: ' + msg);
       process.exit(1);
     }
   })();
