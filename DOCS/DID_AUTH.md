@@ -32,6 +32,24 @@ After changing `resolver_endpoint`, perform these runtime checks:
 
 Incident response: If a compromise is suspected, rotate the Web5 agent keys, revoke issued capabilities at the resolver, and temporarily disable CI runs containing `did-auth` until the environment is recovered.
 
+## Credential & Token Rotation Runbook
+
+When to rotate:
+- Suspected compromise
+- Routine security policy intervals or key expiry
+- Moving to a new resolver host or operator
+
+High level steps for rotation:
+1. Rotate signing keys / credentials in the external Web5 resolver (do not store private keys in this repo).
+2. Update any resolver policy mappings or trusted audience settings for the DID and GitHub OIDC issuer as needed.
+3. If moving resolvers, update `resolver_endpoint` in `config/identity.web5.json` to the new HTTPS URL and document the change.
+4. Validate the change by running `make ci-check` followed by a CI run:
+  - Confirm the did-auth step succeeds and that the `DID_WEB5_SESSION_TOKEN` is created (job-scoped) without being logged.
+  - Check resolver logs show OIDC validation and issuance of the short-lived token.
+5. If any issue arises, roll back the resolver configuration or disable the did-auth step until the environment is fixed.
+
+Important: No rotation steps should require changing sensitive values in this repository; all secrets remain external to the repo and should be handled by the Web5 resolver or a secret manager.
+
 ## Security Notes
 
 - `resolver_endpoint` must point to an HTTPS endpoint operated by a trusted Web5 agent; do not use HTTP endpoints in production.

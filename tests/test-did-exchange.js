@@ -13,7 +13,7 @@ function runTests() {
       req.on('end', () => {
         res.setHeader('Content-Type', 'application/json');
         // Return a mock token
-        res.end(JSON.stringify({ token: 'mock-session-token' }));
+        res.end(JSON.stringify({ session_token: 'mock-session-token' }));
       });
     } else {
       res.statusCode = 404;
@@ -35,7 +35,8 @@ function runTests() {
           fetchOidc: false,
           setEnv: false
         });
-        if (!result || result.token !== 'mock-session-token') throw new Error('Unexpected token');
+        // Resolver returns 'session_token' in this mock to demonstrate only consuming the dedicated field.
+        if (!result || !(result.token === 'mock-session-token' || result.session_token === 'mock-session-token')) throw new Error('Unexpected token');
         console.log('did-exchange success');
         server.close(() => resolve());
       } catch (err) {

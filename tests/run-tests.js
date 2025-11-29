@@ -6,6 +6,7 @@ const { run: runFailure } = require('./test-did-exchange-failure');
 const { run: runLocal } = require('./test-did-local');
 const { run: runMissing } = require('./test-did-exchange-missing-env');
 const { run: runEnvWrite } = require('./test-did-exchange-env-write');
+const { run: runNoArtifactLeak } = require('./test-no-artifact-token-leak');
 
 async function runAll() {
   try {
@@ -19,6 +20,7 @@ async function runAll() {
     runLocal();
       await runFailure();
       await runMissing();
+      await runNoArtifactLeak();
     console.log('DID exchange test passed');
     console.log('All tests passed');
   } catch (err) {

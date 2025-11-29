@@ -56,6 +56,28 @@ jobs:
 
       - name: Show identity config (sanity)
         run: cat ./config/identity.web5.json
+
+      # Example: Safe way to reuse did-auth in another job
+      # deploy-example:
+      #   name: Deploy Example (commented)
+      #   runs-on: ubuntu-latest
+      #   permissions:
+      #     id-token: write
+      #     contents: read
+      #   steps:
+      #     - name: Checkout
+      #       uses: actions/checkout@v4
+      #     - name: did-auth: exchange (job-scoped)
+      #       run: |
+      #         # Prefer performing did-auth in this job for a job-scoped token
+      #         node scripts/did-auth-exchange.js || exit 1
+      #     - name: Use token safely
+      #       run: |
+      #         # Use $GITHUB_ENV provided token only in this job
+      #         echo "Uses job-scoped DID_WEB5_SESSION_TOKEN"
+      #
+      # Alternative: Use an external secret manager / Web5 agent and avoid serializing tokens across jobs.
+      # Do not pass DID_WEB5_SESSION_TOKEN via job outputs or write it to artifacts; each job should obtain its own token or use a secure store.
       - name: Dry-run DID resolver (local)
         run: |
           node -e "require('./scripts/resolve-did.js');"

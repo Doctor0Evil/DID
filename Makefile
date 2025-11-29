@@ -27,8 +27,8 @@ secret-scan:
 	@echo "Scanning for high-probability secrets..."
 	@set -e; \\
 	EGREP='egrep -n --binary-files=without-match'; \\
-	PATTERN='(A3T[A-Z0-9]{14}|AKIA[0-9A-Z]{16}|BEGIN RSA PRIVATE KEY|-----BEGIN PRIVATE KEY|BEGIN EC PRIVATE KEY|PRIVATE KEY|ghp_[A-Za-z0-9_]{36}|GITHUB_TOKEN)'; \\
-	FOUND=$$($${EGREP} "$${PATTERN}" . || true); \\
+	PATTERN='(A3T[A-Z0-9]{14}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|-----BEGIN PRIVATE KEY-----|-----BEGIN RSA PRIVATE KEY-----|-----BEGIN OPENSSH PRIVATE KEY-----|PRIVATE KEY|ghp_[0-9A-Za-z_]{30,}|eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*|GITHUB_TOKEN)'; \\
+	FOUND=$$($${EGREP} "$${PATTERN}" --exclude-dir=.git -I . || true); \\
 	if [ ! -z "$$FOUND" ]; then echo "Potential secrets detected:"; echo "$$FOUND"; exit 1; else echo "No high-confidence secrets detected"; fi
 
 ci-check:

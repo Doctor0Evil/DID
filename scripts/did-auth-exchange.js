@@ -149,11 +149,12 @@ async function exchangeWithResolver(opts = {}) {
 
   // Contractual: Resolver must return short-lived tokens; long-lived or reusable keys are forbidden and should be rejected by the resolver.
   const resp = await postToResolver(resolverEndpoint, payload);
-  // Expecting { token: '...' }
-  if (!resp || !resp.token) throw new Error('Resolver returned no token');
-  // Contractual: this is the only place the DID session token is stored in the runner; do not add any other sinks.
-  if (opts.setEnv !== false) writeToGithubEnv('DID_WEB5_SESSION_TOKEN', resp.token);
-  return resp;
+    // Expecting { token: '...' } or { session_token: '...' } from resolver.
+    const session = (resp && resp.session_token) || (resp && resp.token);
+    if (!session) throw new Error('Resolver returned no session token');
+    // Contractual: this is the only place the DID session token is stored in the runner; do not add other sinks.
+    if (opts.setEnv !== false) writeToGithubEnv('DID_WEB5_SESSION_TOKEN', session);
+    return { token: session };
 }
 
 // CLI wrapper
