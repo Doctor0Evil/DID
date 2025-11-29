@@ -1,0 +1,13 @@
+{
+  "name": "did-workspace",
+  "version": "0.1.0",
+  "description": "DID/Web5 workspace for CI authentication demo",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests/run-all-tests.js",
+    "lint": "eslint . || true"
+  },
+  "keywords": ["web5", "did", "ci", "oidc"],
+  "author": "Doctor Jacob Scott Farmer",
+  "license": "MIT"
+}

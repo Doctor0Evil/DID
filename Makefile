@@ -10,7 +10,7 @@ init:
 
 test:
 	@echo "Running tests..."
-	@if [ -f tests/run-tests.js ]; then node tests/run-tests.js || true; else echo "No tests found - skipped"; fi
+	@if [ -f package.json ]; then npm test || true; elif [ -f tests/run-tests.js ]; then node tests/run-tests.js || true; else echo "No tests found - skipped"; fi
 
 lint:
 	@echo "Running linters..."

@@ -1,0 +1,5 @@
+# Node modules and session files
+node_modules/
+.d.runtokens
+.did-session.tmp
+.env.local
