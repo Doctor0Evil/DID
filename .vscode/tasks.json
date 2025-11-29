@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Make: init",
+      "type": "shell",
+      "command": "make init",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Make: test",
+      "type": "shell",
+      "command": "make test",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

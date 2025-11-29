@@ -34,6 +34,11 @@ jobs:
 
       - name: Echo DID identity anchor
         run: echo "Using DID identity anchor from config/identity.web5.json"
+      - name: Show identity config
+        run: cat ./config/identity.web5.json
+      - name: Dry-run DID resolver (local)
+        run: |
+          node -e "require('./scripts/resolve-did.js');"
 
 # Note: This workflow does not include secrets or token references. Integration with a Web5/DID agent
 # should be performed by reusable workflows or external actions that resolve credentials at runtime.
