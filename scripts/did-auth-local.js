@@ -22,8 +22,12 @@ async function main() {
     console.error('Missing identity config');
     process.exit(1);
   }
+  if (!process.env.LOCAL_OIDC_TOKEN) {
+    console.error('Missing LOCAL_OIDC_TOKEN env var for local exchange (do not commit secrets)');
+    process.exit(1);
+  }
   try {
-    const resp = await exchangeWithResolver({ fetchOidc: false });
+    const resp = await exchangeWithResolver({ fetchOidc: false, oidcToken: process.env.LOCAL_OIDC_TOKEN });
     if (resp && resp.token) {
       const p = writeSessionToTmp(resp.token);
       if (p) {

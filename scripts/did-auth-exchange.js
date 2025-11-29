@@ -21,15 +21,19 @@ function readIdentityConfig() {
   }
 }
 
-function fetchOidcTokenFromGitHub(oidcUrl, oidcToken) {
+function fetchOidcTokenFromGitHub(oidcUrl, oidcToken, audience) {
   return new Promise((resolve, reject) => {
     if (!oidcUrl || !oidcToken) return reject(new Error('Missing OIDC request URL or token'));
     const lib = oidcUrl.startsWith('https') ? https : http;
-    const url = new URL(oidcUrl);
+    // Append audience if provided
+    const urlObj = new URL(oidcUrl);
+    if (audience) {
+      if (!urlObj.searchParams.get('audience')) urlObj.searchParams.append('audience', audience);
+    }
     const opts = {
-      hostname: url.hostname,
-      path: url.pathname + (url.search || ''),
-      port: url.port || (url.protocol === 'https:' ? 443 : 80),
+      hostname: urlObj.hostname,
+      path: urlObj.pathname + (urlObj.search || ''),
+      port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
       method: 'GET',
       headers: {
         Authorization: `Bearer ${oidcToken}`
@@ -42,7 +46,15 @@ function fetchOidcTokenFromGitHub(oidcUrl, oidcToken) {
         if (res.statusCode < 200 || res.statusCode >= 300) {
           return reject(new Error(`OIDC fetch failed - status ${res.statusCode}`));
         }
-        resolve(data.toString());
+        try {
+          const parsed = JSON.parse(data.toString());
+          // GitHub Action's endpoint returns JSON with a 'value' property containing the token
+          if (typeof parsed.value === 'string') return resolve(parsed.value);
+          // Fall back to raw string if parsing doesn't match expectations
+          return resolve(data.toString());
+        } catch (err) {
+          return resolve(data.toString());
+        }
       });
     });
     req.on('error', reject);
@@ -108,12 +120,14 @@ async function exchangeWithResolver(opts = {}) {
   const oidcUrl = opts.oidcUrl || process.env.ACTIONS_ID_TOKEN_REQUEST_URL;
   const oidcToken = opts.oidcToken || process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN || process.env.LOCAL_OIDC_TOKEN;
 
-  if (!oidcUrl || !oidcToken) throw new Error('Missing OIDC environment variables');
+  if (!oidcUrl || !oidcToken) {
+    throw new Error('Missing ACTIONS_ID_TOKEN_REQUEST_URL or ACTIONS_ID_TOKEN_REQUEST_TOKEN (OIDC env)');
+  }
 
   // Fetch the OIDC token if we were given a URL (in GH Actions) or use local token.
   let idToken = oidcToken;
   if (opts.fetchOidc && oidcUrl) {
-    const raw = await fetchOidcTokenFromGitHub(oidcUrl, oidcToken);
+    const raw = await fetchOidcTokenFromGitHub(oidcUrl, oidcToken, cfg.capability_audience || 'github-actions');
     idToken = raw.toString();
   }
 

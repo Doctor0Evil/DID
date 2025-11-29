@@ -17,8 +17,9 @@ This document explains the tokenless CI pattern used in this repository.
 - `scripts/did-auth-local.js` - development helper that can use `LOCAL_OIDC_TOKEN` or mock flows and writes the session token only to a `.did-session.tmp` file (gitignored). It supports `--print-status` to check whether a session exists.
 
 ## Workflow integration
-- The GitHub Actions workflow (`.github/workflows/ci.yml`) has `id-token: write` permission and an explicit `did-auth-bootstrap` job which runs before main steps.
-- `did-auth-bootstrap` runs `scripts/did-auth-exchange.js` and sets a job output `did_token`. The build job depends on `did-auth-bootstrap` and uses `needs.did-auth-bootstrap.outputs.did_token` as `DID_WEB5_SESSION_TOKEN`.
+- The GitHub Actions workflow (`.github/workflows/ci.yml`) sets `id-token: write` permission at the build job level.
+- The CI workflow includes a `did-auth` step early in the `build` job that runs `scripts/did-auth-exchange.js` and writes `DID_WEB5_SESSION_TOKEN` into the job environment via `$GITHUB_ENV` (no token printed to logs).
+- Downstream steps in the same job can access `DID_WEB5_SESSION_TOKEN` from the environment without exposing it to job outputs or logs.
 - Downstream steps should use the `DID_WEB5_SESSION_TOKEN` environment variable and include the DID anchor as `X-DID-Identity` header for any resolver calls or API requests.
 
 ## Security notes
@@ -29,4 +30,4 @@ This document explains the tokenless CI pattern used in this repository.
 1. Replace `resolver_endpoint` in `config/identity.web5.json` with your Web5 resolver URL.
 2. Configure your Web5 agent to trust GitHub's OIDC issuer and map the GitHub actions run to the configured DID anchor.
 3. Ensure your resolver accepts and verifies OIDC-proof claims from GitHub and returns a short-lived capability token.
-4. Optionally wire the `did-auth-bootstrap` job to produce a job output or store secrets in-memory only (never in the repo).
+4. Optionally, if you require passing the token across jobs, use an external secret manager or a secure artifact store. Avoid exposing the raw token as a job output.

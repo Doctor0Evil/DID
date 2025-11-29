@@ -11,8 +11,8 @@ This repo includes a runtime identity anchor that references a DID used for prov
 
 ### DID-based Tokenless CI Authentication
 This repository demonstrates a tokenless CI authentication pattern where:
-- GitHub Actions requests a short-lived OIDC token at runtime (requires `id-token: write` permission).
+- GitHub Actions requests a short-lived OIDC token at runtime (requires `id-token: write` permission on the build job).
 - `scripts/did-auth-exchange.js` exchanges that OIDC token with a Web5/DID resolver for a short-lived DID-bound capability.
-- The resolver returns a short-lived session token which is set as `DID_WEB5_SESSION_TOKEN` in the runner environment and used by downstream steps.
+- The CI workflow runs a `did-auth` step early in the build job that writes the session token as `DID_WEB5_SESSION_TOKEN` to the job environment via `$GITHUB_ENV`. Downstream steps in the same job can use it; it is not echoed to logs.
 
 See `DOCS/DID_AUTH.md` for more details and operator tasks.

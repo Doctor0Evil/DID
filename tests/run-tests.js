@@ -1,5 +1,6 @@
 const { run } = require('./test-config');
 const { runTests } = require('./test-did-exchange');
+const { run: runOidc } = require('./test-did-exchange-oidc');
 const { run: runFailure } = require('./test-did-exchange-failure');
 const { run: runLocal } = require('./test-did-local');
 const { run: runMissing } = require('./test-did-exchange-missing-env');
@@ -10,6 +11,7 @@ async function runAll() {
       run(); 
     console.log('Config test passed');
       await runTests();
+      await runOidc();
       await runEnvWrite();
     runLocal();
       await runFailure();

@@ -1,7 +1,6 @@
 name: CI
 
 permissions:
-  id-token: write
   contents: read
 
 on:
@@ -11,35 +10,12 @@ on:
     branches: [ main ]
 
 jobs:
-  did-auth-bootstrap:
-    runs-on: ubuntu-latest
-    outputs:
-      did_token: ${{ steps.did-auth.outputs.did_token }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: did-auth: exchange
-        id: did-auth
-        run: |
-          set -e
-          node scripts/did-auth-exchange.js || exit 1
-          # The script writes DID_WEB5_SESSION_TOKEN to $GITHUB_ENV; optionally you can also set the step output
-          if [ -f "$GITHUB_ENV" ]; then
-            # Read token safely but do not echo it
-            token_line=$(grep '^DID_WEB5_SESSION_TOKEN=' "$GITHUB_ENV" || true)
-            if [ ! -z "$token_line" ]; then
-              echo "did_token=${token_line#DID_WEB5_SESSION_TOKEN=}" >> $GITHUB_OUTPUT
-            fi
-          fi
-        env:
-          GITHUB_ENV: ${{ env.GITHUB_ENV }}
-          GITHUB_OUTPUT: ${{ env.GITHUB_OUTPUT }}
 
   build:
-    needs: [did-auth-bootstrap]
     runs-on: ubuntu-latest
-    env:
-      DID_WEB5_SESSION_TOKEN: ${{ needs.did-auth-bootstrap.outputs.did_token }}
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,6 +33,9 @@ jobs:
       - name: Run init
         run: make init
 
+      
+      - name: Run secret scan
+        run: make secret-scan
       - name: Run lint
         run: make lint
 
@@ -65,7 +44,14 @@ jobs:
 
       - name: Echo DID identity anchor
         run: echo "Using DID identity anchor from config/identity.web5.json"
-      - name: Show identity config
+      - name: did-auth: exchange
+        id: did-auth
+        run: |
+          set -e
+          node scripts/did-auth-exchange.js || exit 1
+          # Do not print token or response - script writes token to $GITHUB_ENV
+
+      - name: Show identity config (sanity)
         run: cat ./config/identity.web5.json
       - name: Dry-run DID resolver (local)
         run: |
