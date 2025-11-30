@@ -3,3 +3,4 @@ node_modules/
 .d.runtokens
 .did-session.tmp
 .env.local
+release-notes-*.md

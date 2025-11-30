@@ -8,4 +8,13 @@ Usage (in another repo):
 - Provide your own `config/identity.web5.json` in the caller repo.
 - Prefer `resolver_dry_run: 'true'` when testing locally or in CI.
 
-This example uses a relative path to the reusable workflow for in-repo demonstrations and should NOT be used across repos directly.
+Using the published v1.0.0 tag
+
+When referencing the published and released v1.0.0 in a real repo, point to the tag instead of the relative path:
+
+```yaml
+uses: <ORG>/<REPO>/.github/workflows/did-auth-reusable.yml@v1.0.0
+# Replace `<ORG>/<REPO>` with the publishing org and repository name when you adopt the reusable workflow.
+```
+
+In this repository's examples and tests we sometimes use a relative `uses: ./.github/workflows/did-auth-reusable.yml` for in-repo demonstration; real callers should use the org and tag format above.

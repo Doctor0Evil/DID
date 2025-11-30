@@ -17,6 +17,8 @@ This repository demonstrates a tokenless CI authentication pattern where:
 
 See `DOCS/DID_AUTH.md` for more details and operator tasks.
 
+Note: This repository includes an automated CI integration test `.github/workflows/did-auth-reusable-ci-test.yml` that invokes the reusable did-auth workflow in dry-run mode on `push` and `pull_request` to `main` to ensure stability before a tag is published.
+
 ### Quick Health Check
 Run the following to perform a lightweight CI health check (dry-run):
 

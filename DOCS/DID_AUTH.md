@@ -55,6 +55,33 @@ Important: No rotation steps should require changing sensitive values in this re
 - The reusable workflow runs a job-scoped did-auth step and sets a boolean output `has-session` to indicate whether a job-scoped token exists. It does NOT expose tokens or allow token values via outputs.
 - Callers should perform downstream steps in the same job or perform their own did-auth exchange; do not serialize tokens across jobs or artifacts.
 
+### Tagging and GitHub release
+
+To publish a stable version of the reusable workflow, create an annotated tag, push it upstream, and then draft a GitHub release for organizational use:
+
+```bash
+git tag -a v1.0.0 -m "DID/Web5 did-auth reusable workflow v1.0.0"
+git push origin v1.0.0
+```
+
+Then use the GitHub UI (`Releases -> Draft a new release`) to draft and publish the release; include the `v1.0.0` section from `CHANGELOG.md` as the release notes. Consumers should reference the tagged release in their workflows using `uses: <ORG>/<REPO>/.github/workflows/did-auth-reusable.yml@v1.0.0`.
+Operators: This repository contains helper tooling to validate and draft release notes before tagging. Use:
+
+```bash
+make release TAG=v1.0.0
+# or
+npm run publish-release -- --tag v1.0.0
+```
+
+The helper creates `release-notes-v1.0.0.md` extracted from `CHANGELOG.md` and runs local CI checks; it does not publish the release automatically.
+
+Operator reminder: After cutting or updating tags like `v1.0.0`, verify CI workflows (including `.github/workflows/did-auth-reusable-ci-test.yml`) are passing before recommending other repos adopt the tag.
+
+### Automated CI validation for reusable workflow
+
+This repository includes an automated integration test workflow that validates the reusable workflow on every push and pull request (see `.github/workflows/did-auth-reusable-ci-test.yml`). The test invokes the reusable workflow in dry-run mode and checks for a boolean `has-session` output; it does not print or export token values.
+
+
 ## Security Notes
 
 - `resolver_endpoint` must point to an HTTPS endpoint operated by a trusted Web5 agent; do not use HTTP endpoints in production.

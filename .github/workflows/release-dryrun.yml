@@ -1,0 +1,30 @@
+name: Release script dry-run validation
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  release-dryrun:
+    name: Release script dry-run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run publish-release in dry-run mode
+        env:
+          PUBLISH_DRY_RUN: '1'
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          # Note: This job runs the publish-release script in dry-run mode and must never publish a real release.
+          node scripts/publish-release.js --tag v0.0.0-test --dry-run --skip-ci
+
+      # The job relies on the script exiting with a success status; it does not publish or mutate the repo.

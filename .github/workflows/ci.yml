@@ -94,7 +94,9 @@ jobs:
 #     contents: read
 #   steps:
 #     - name: Reuse did-auth reusable workflow
-#       uses: Doctor0Evil/DID/.github/workflows/did-auth-reusable.yml@main
+#       # In development you can reference `@main` or a relative path, but for published usage
+#       # callers should reference a pinned tag such as `@v1.0.0`:
+#       uses: Doctor0Evil/DID/.github/workflows/did-auth-reusable.yml@v1.0.0
 #       with:
 #         working-directory: '.'
 #         did_config_path: 'config/identity.web5.json'

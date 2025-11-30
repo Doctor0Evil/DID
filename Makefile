@@ -39,3 +39,37 @@ ci-check:
 	@RESOLVER_DRY_RUN=true node scripts/did-auth-exchange.js || true
 	@make secret-scan
 	@make test
+
+# Validate and create a release draft locally (does not publish):
+# Usage: make release TAG=v1.0.0
+release:
+	@if [ -z "$(TAG)" ]; then echo "Usage: make release TAG=v1.0.0" && exit 1; fi
+	@echo "Validating release for $(TAG)..."
+	@node scripts/publish-release.js --tag $(TAG)
+
+# Internal helper to draft release notes without publishing. Use `make release TAG=vX.Y.Z` to run validations and draft notes.
+#########################################################################
+# Optional: Draft a GitHub release using the `gh` CLI
+# This target is intended for manual use by maintainers only and should not be run from CI.
+# It drafts a release using the `gh` CLI and a prepared `release-notes-<TAG>.md` file.
+# Usage: make release-draft TAG=v1.0.0
+#
+# Safety: The target prompts the user for an interactive confirmation when running
+# from a TTY, unless explicit RELEASE_DRAFT_FORCE=1 is set (not recommended for CI).
+# If running non-interactively, the command will require RELEASE_DRAFT_FORCE=1.
+#########################################################################
+release-draft:
+	@if [ -z "$(TAG)" ]; then echo "Usage: make release-draft TAG=v1.0.0" && exit 1; fi
+	@if ! command -v gh >/dev/null 2>&1; then echo 'gh CLI not detected; install and authenticate to continue' && exit 1; fi
+	@echo "Drafting GitHub Release for $(TAG) (draft only)"
+	@if [ -z "$(RELEASE_DRAFT_FORCE)" ]; then \
+		if [ -t 0 ]; then \
+			read -p "About to run 'gh release create $(TAG) --draft'. Continue? [y/N] " ans; \
+			[ "$$ans" = "y" ] || { echo "Aborted."; exit 1; }; \
+		else \
+			echo "Non-interactive shell; set RELEASE_DRAFT_FORCE=1 to skip prompt" && exit 1; \
+		fi; \
+	fi
+	@gh release create $(TAG) --draft --notes-file release-notes-$(TAG).md || ( echo "gh release create failed" && exit 1 )
+
+

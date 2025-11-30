@@ -1,0 +1,33 @@
+name: Reusable DID Auth CI Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  did-auth-reusable:
+    name: Reusable DID Auth (CI test)
+    uses: ./.github/workflows/did-auth-reusable.yml
+    with:
+      working-directory: '.'
+      did_config_path: 'config/identity.web5.json'
+      resolver_dry_run: 'true'
+
+  verify:
+    name: Verify reusable did-auth produced session
+    runs-on: ubuntu-latest
+    needs: [did-auth-reusable]
+    steps:
+      - name: Check has-session
+        run: |
+          if [ "${{ needs.did-auth-reusable.outputs.has-session }}" = "true" ]; then
+            echo "CI reusable did-auth test: session token present (value not shown).";
+            exit 0;
+          fi
+          echo "CI reusable did-auth test: no session token produced";
+          exit 1;
+
+# This CI workflow calls the reusable did-auth workflow in dry-run mode and checks for a boolean 'has-session' output.
+# It does not print any token values and does not export tokens as outputs or artifacts.
